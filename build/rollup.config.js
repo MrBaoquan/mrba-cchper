@@ -19,7 +19,7 @@ const external = [
     'moment','cc'
 ]
 
-module.exports = [
+export default [
     {
         input: resolveFile("src/index.ts"),
         output:{

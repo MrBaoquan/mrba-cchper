@@ -16,7 +16,8 @@
   },
   "files": [
     "dist/**/*",
-    "!dist/**/*.map"
+    "!dist/**/*.map",
+    "!build"
   ],
   "publishConfig": {
     "registry": "http://registry.npmjs.org/"
