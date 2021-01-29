@@ -1,7 +1,7 @@
 process.env.NODE_ENV = 'production';
 
 import { terser } from "rollup-plugin-terser";
-const configList = require('./rollup.config');
+import configList from './rollup.config';
 
 configList.map((config, index) => {
 

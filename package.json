@@ -1,6 +1,6 @@
 {
   "name": "mrba-cchper",
-  "version": "0.1.0-alpha.3",
+  "version": "0.1.0-alpha.4",
   "description": "cocos creator framework",
   "keywords": [
     "typescript"
@@ -16,7 +16,8 @@
   },
   "files": [
     "dist/**/*",
-    "!dist/**/*.map"
+    "!dist/**/*.map",
+    "!build"
   ],
   "publishConfig": {
     "registry": "http://registry.npmjs.org/"
