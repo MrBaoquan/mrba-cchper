@@ -19,23 +19,19 @@ const external = [
     'moment','cc'
 ]
 
-export default [
-    {
+let _mapTarget = (_target)=>{
+    return {
         input: resolveFile("src/index.ts"),
         output:{
-            file:resolveFile("dist/esm/index.mjs"),
-            format:"esm",   // cjs  system
+            file:resolveFile(`dist/${_target}/index.mjs`),
+            format:_target,   // cjs  system
         },
         plugins,
-        external
-    },
-    {
-        input: resolveFile("src/index.ts"),
-        output:{
-            file:resolveFile("dist/cjs/index.js"),
-            format:"cjs",   // cjs  system
-        },
-        plugins,
-        external
+        external    
     }
-]
+}
+
+export default 
+    process.env.NODE_ENV==="production"
+    ?["esm","cjs"].map(_mapTarget)
+    :["esm"].map(_mapTarget);

@@ -5,7 +5,7 @@ declare class BaseComponent extends Component {
     protected Get<T extends Component>(path: string, classConstructor: __private.Constructor<T>): T | null;
 }
 declare function mapString2CCAssetType(classname: string): __private.cocos_core_asset_manager_shared_AssetType;
-declare class CCHelperEntry extends BaseComponent {
+declare class CCHperEntry extends BaseComponent {
     private resConfig;
     private uiConfig;
     readonly initializeFunction: string;
@@ -150,4 +150,4 @@ declare class Managements {
     static readonly Resource: ResourceManager;
     static readonly Scene: SceneManager;
 }
-export { CCHelperEntry, BaseComponent, mapString2CCAssetType, Platform, PersistSceneName, StartSceneName, Constructor, ISceneScript, MetaData, ui_script, scene_script, ResourceManager, SceneManager, UIType, UIBase, UIManager, Managements };
+export { CCHperEntry, BaseComponent, mapString2CCAssetType, Platform, PersistSceneName, StartSceneName, Constructor, ISceneScript, MetaData, ui_script, scene_script, ResourceManager, SceneManager, UIType, UIBase, UIManager, Managements };

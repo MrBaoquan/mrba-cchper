@@ -1,4 +1,4 @@
-import { Component, __private } from "cc";
+import { __private } from "cc";
 import { CallFunction } from "mrba-eshper";
 import { UIBase } from "./UIManager/UIBase";
 
@@ -40,11 +40,19 @@ export class MetaData{
     }
 }
 
+/**
+ * 注册UI脚本
+ * @param className 脚本名称
+ */
 export const ui_script = <T extends UIBase>(className:string)=>(target:new(...args:any[])=>T)=>{
     CallFunction(Reflect.get(MetaData,"uiClassNamesMap"),"set",target.prototype.constructor.name, className);
     CallFunction(Reflect.get(MetaData,"uiScriptClasses"),"set",className, target);
 }
 
+/**
+ * 注册场景脚本
+ * @param classname 场景脚本名称
+ */
 export const scene_script = <T extends ISceneScript>(classname:string)=>(target:new(...args:any[])=>any)=>{
     CallFunction(Reflect.get(MetaData,"sceneScriptClasses"), "set", classname,target);
 }

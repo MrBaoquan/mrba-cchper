@@ -1,11 +1,11 @@
 
-import { _decorator, Component, Node, game, Scene, director, find, __private, Label, resources, Prefab, instantiate, Constructor, JsonAsset } from 'cc';
+import { _decorator, Component, Node, find, __private, Prefab, instantiate, Constructor, JsonAsset } from 'cc';
 import { Logger, isset, CallFunction } from 'mrba-eshper';
 import { ResourceManager } from '../ResourceManager/ResourceManager';
 import { MetaData } from '../TypeDefinitions';
 import { UIBase, UIType } from './UIBase';
 import { UIConfig, UINodeInfo } from './UIConfig';
-const { ccclass, property, executionOrder } = _decorator;
+const { ccclass, executionOrder } = _decorator;
 
 @ccclass
 @executionOrder(-1001)
@@ -33,7 +33,7 @@ export class UIManager extends Component
         Logger.Warn(UIManager.Instance);
     }
 
-    initialize(asset?:JsonAsset){
+    private initialize(asset?:JsonAsset){
         return new Promise((resolve,reject)=>{
             this.StandaloneUIRoot = find("StandaloneUI",this.node)!;
             this.NormalUIRoot = find("NormalUI",this.node)!;
@@ -48,10 +48,15 @@ export class UIManager extends Component
     /**
      * 获取UI实例
      * @param UIKey UI名称
-     * @param callback 成功获取到UI后的回调   失败无回调
+     * @param callback 成功获取到UI实例后的回调 失败无回调
      */
     public Get(UIKey:string, callback?:(ui:UIBase)=>void):UIBase|null;
-    public Get<T extends UIBase>(UIKey:Constructor<T>, callback?:(ui:T)=>void):T|null;
+    /**
+     * 获取UI实例
+     * @param UIClass UI类型
+     * @param callback 成功获取到UI实例后的回调 失败无回调
+     */
+    public Get<T extends UIBase>(UIClass:Constructor<T>, callback?:(ui:T)=>void):T|null;
     public Get(UIKey:any, callback:(ui:any)=>void):any{
         if(typeof UIKey === "string"){
             return this.getUI(UIKey, _ui=>{
@@ -68,10 +73,15 @@ export class UIManager extends Component
     /**
      * 显示UI
      * @param UIKey UI名称
-     * @param callback 成功获取到UI后的回调  失败无回调
+     * @param callback 成功获取到UI实例后的回调 失败无回调
      */
     public Show(UIKey:string, callback?:(ui:UIBase)=>void):UIBase|null;
-    public Show<T extends UIBase>(UIKey:Constructor<T>, callback?:(ui:T)=>void):T|null;
+    /**
+     * 显示UI
+     * @param UIClass UI类型
+     * @param callback 成功获取到UI实例后的回调 失败无回调
+     */
+    public Show<T extends UIBase>(UIClass:Constructor<T>, callback?:(ui:T)=>void):T|null;
     public Show(UIKey:any, callback:(ui:any)=>void):any
     {
         if(typeof UIKey==='string'){
@@ -95,7 +105,12 @@ export class UIManager extends Component
      * @param callback 成功获取到UI实例后的回调 失败无回调
      */
     public Hide(UIKey:string, callback?:(ui:UIBase)=>void) : UIBase|null;
-    public Hide<T extends UIBase>(UIKey:Constructor<T>, callback?:(ui:T)=>void):T|null;
+    /**
+     * 隐藏UI
+     * @param UIClass UI类型
+     * @param callback 成功获取到UI实例后的回调 失败无回调
+     */
+    public Hide<T extends UIBase>(UIClass:Constructor<T>, callback?:(ui:T)=>void):T|null;
     public Hide(UIKey:any, callback:(ui:any)=>void):any{
         if(typeof UIKey==="string"){
             return this.hideUI(UIKey,_ui=>{
@@ -350,11 +365,4 @@ export class UIManager extends Component
         return null;
     }
 
-    
-    
-
 }
-
-(function(){
-    console.log("require ui manager");
-})();

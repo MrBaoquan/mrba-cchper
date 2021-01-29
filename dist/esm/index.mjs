@@ -1,4 +1,6 @@
-import{Component as e,find as t,Asset as s,Material as n,Texture2D as i,SpriteFrame as r,Prefab as o,resources as a,JsonAsset as l,director as c,assetManager as h,instantiate as u,_decorator as d,game as p,sys as g}from"cc";import f from"moment";
+import { Component, find, Asset, Material, Texture2D, SpriteFrame, Prefab, resources, JsonAsset, director, assetManager, instantiate, _decorator, game, sys } from 'cc';
+import r from 'moment';
+
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation.
 
@@ -12,4 +14,973 @@ INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
 LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
 OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 PERFORMANCE OF THIS SOFTWARE.
-***************************************************************************** */function I(e,t,s,n){var i,r=arguments.length,o=r<3?t:null===n?n=Object.getOwnPropertyDescriptor(t,s):n;if("object"==typeof Reflect&&"function"==typeof Reflect.decorate)o=Reflect.decorate(e,t,s,n);else for(var a=e.length-1;a>=0;a--)(i=e[a])&&(o=(r<3?i(o):r>3?i(t,s,o):i(t,s))||o);return r>3&&o&&Object.defineProperty(t,s,o),o}function S(e,t,...s){if("function"==typeof e)return Reflect.apply(e,t,s);if("object"==typeof e){let n=Reflect.get(e,t,s);if(void 0===n)return;return S(n,e,...s)}return null}function U(e,t,s){let n=0,i=()=>{++n>=e.length&&s()};for(let s of e)t(s,i)}class y{static Register(e){e.info&&(this.info=e.info),e.warn&&(this.warn=e.warn),e.error&&(this.error=e.error)}static Log(e,...t){y.doLogger(this.info,e,...t)}static Warn(e,...t){y.doLogger(this.warn,e,...t)}static Error(e,...t){y.doLogger(this.error,e,...t)}static doLogger(e,t,...s){let n=f().format("YYYY-MM-DD HH:mm:ss.SSS")+": ";"string"==typeof t?e(n+t,...s):e(n,t)}}y.info=console.log,y.warn=console.warn,y.error=console.error;const m=Symbol(),w=e=>new Proxy(e,{construct:(e,t,s)=>e.prototype!==s.prototype?Reflect.construct(e,t,s):(e[m]||(e[m]=Reflect.construct(e,t,s)),e[m])});function v(e){return null!=e}const N="Persistence",b="SceneEntry";class R{}class C{static IsSceneScriptRegistered(e){return this.sceneScriptClasses.has(e)}static GetSceneScriptConstrutor(e){var t;return this.IsSceneScriptRegistered(e)&&null!==(t=this.sceneScriptClasses.get(e))&&void 0!==t?t:null}static IsUIScriptRegistered(e){if("string"==typeof e)return this.uiScriptClasses.has(e);let t=e.prototype.constructor.name;return!!this.uiClassNamesMap.has(t)&&this.uiScriptClasses.has(this.uiClassNamesMap.get(t))}static GetUIScriptConstructor(e){var t;return null!==(t=this.uiScriptClasses.get(e))&&void 0!==t?t:null}static GetUIClassRegisteredName(e){var t;return null!==(t=this.uiClassNamesMap.get(e.prototype.constructor.name))&&void 0!==t?t:null}}C.sceneScriptClasses=new Map,C.uiClassNamesMap=new Map,C.uiScriptClasses=new Map;const _=e=>t=>{S(Reflect.get(C,"uiClassNamesMap"),"set",t.prototype.constructor.name,e),S(Reflect.get(C,"uiScriptClasses"),"set",e,t)},B=e=>t=>{S(Reflect.get(C,"sceneScriptClasses"),"set",e,t)};class P extends e{Get(e,s){if(void 0===s)return t(e,this.node);var n=t(e,this.node);return null===n?null:n.getComponent(s)}}function G(e){let t=s;switch(e){case"Prefab":t=o;break;case"SpriteFrame":t=r;break;case"Texture2D":t=i;break;case"Material":t=n}return t}let A=class{constructor(){this.config={},this.pathsGroupByScene=new Map,this.assetsGroupByUrl=new Map}Load(e){return new Promise(((t,s)=>{if(v(e))return this.build(e),void t(this.config);a.load("configs/res",l,((e,n)=>{void 0===e?(this.build(n),t(this.config)):s(e)}))}))}build(e){let t=e.json;this.config=t,this.buildPathesGroupByScene()}IsAutoRelease(e){var t;return null!==(t=this.config[e].autoRelease)&&void 0!==t&&t}SyncUrlAsset(e,t){this.assetsGroupByUrl.has(e)||this.assetsGroupByUrl.set(e,new Set),this.assetsGroupByUrl.get(e).add(t)}GetAssetNamesByUrl(e){return this.assetsGroupByUrl.has(e)?Array.from(this.assetsGroupByUrl.get(e)):[]}GetSceneInfo(e){return this.config[e]}getBundles(e){let t=this.config[e];return void 0===t?[]:Array.from(new Set(t.assets.map((e=>this.buildAssetDirInfo(e).bundleName))))}getScenesBundles(e){return Array.from(new Set(e.reduce(((e,t)=>e.concat(this.getBundles(t))),this.getBundles("Persistence"))))}getSceneDirs(e){let t=this.config[e];return void 0===t?[]:t.assets.map((e=>this.buildAssetDirInfo(e)))}getBundleDirs(e,t){return void 0===this.config[e]?[]:this.getSceneDirs(e).filter((e=>e.bundleName===t))}getScenesBundleDirs(e,t){return e.reduce(((e,s)=>e.concat(this.getBundleDirs(s,t))),this.getBundleDirs("Persistence",t))}buildAssetDirInfo(e){let t=e.url,s=/.*\:\/\//.exec(t);if(null===s)return null;let n=s[0].slice(0,-3);if(s=/\:\/\/.*/.exec(t),null===s)return null;let i=s[0].slice(3);return{sceneName:this.GetSceneNameByUrl(t),url:t,bundleName:n,path:i,type:G(e.type)}}GetSceneNameByUrl(e){var t;return null!==(t=this.pathsGroupByScene.get(e))&&void 0!==t?t:"Persistence"}buildPathesGroupByScene(){this.pathsGroupByScene.clear(),Object.keys(this.config).forEach((e=>{this.config[e].assets.forEach((t=>{this.pathsGroupByScene.set(t.url,e)}))}))}};var M;A=I([w],A);let E=M=class{constructor(){this.assets_gby_Bundle=new Map,this.assets_gby_Scene=new Map,this.bundles=new Map,this.config=new A,this.sceneName="",Reflect.set(M,"Instance",this)}initialize(e){return new Promise(((t,s)=>{this.config.Load(e).then((e=>{t(void 0)})).catch()}))}loadScene(e,t,s){if("SceneEntry"===e)return t(1,1,void 0),void s(null,void 0);let n=this.config.GetSceneInfo(e),i=n.bundle;v(n.bundle)?this.pullBundle(i).then((n=>{n.loadScene(e,((e,s,n)=>{t(e,s,n)}),((t,n)=>{c.loadScene(e,s)}))})):c.preloadScene(e,((e,s,n)=>{t(e,s,n)}),((t,n)=>{c.loadScene(e,s)}))}LoadSceneRes(e){return new Promise(((t,s)=>{this.unloadSceneRes(this.curSceneName),this.loadNewSceneRes(e).then((()=>{t(void 0)})).catch(s)}))}unloadSceneRes(e){if(console.log("unload scene %s",e),!this.config.IsAutoRelease(e))return;let t=this.config.getSceneDirs(e);t.forEach((e=>{var t;null===(t=this.bundles.get(e.bundleName))||void 0===t||t.release(e.path,e.type)}));let s=t.map((e=>e.url)).reduce(((e,t)=>this.config.GetAssetNamesByUrl(t)),new Array),n=this.config.getBundles(e);Array.from(this.assets_gby_Bundle.keys()).filter((e=>n.includes(e))).forEach((e=>{Array.from(this.assets_gby_Bundle.get(e).keys()).filter((e=>s.includes(e))).forEach((t=>{this.assets_gby_Bundle.get(e).delete(t),console.log("移除%s包 %s资源",e,t)}))})),this.assets_gby_Scene.has(e)&&Array.from(this.assets_gby_Scene.get(e).keys()).forEach((t=>{s.includes(t)&&(this.assets_gby_Scene.get(e).delete(t),console.log("移除%s场景 %s资源",e,t))}))}loadNewSceneRes(e){return new Promise(((t,s)=>{console.log("加载自定义场景资源: ",e[0]);let n=this.config.getScenesBundles(e);console.log("包列表",n),U(n,((t,n)=>{let i=t;this.pullBundle(i).then((t=>{U(this.config.getScenesBundleDirs(e,i),((e,t)=>{this.loadResourceDir(e).then((s=>{var n,r;let o=e.url,a=e.sceneName;this.assets_gby_Bundle.has(i)||this.assets_gby_Bundle.set(i,new Map),this.assets_gby_Scene.has(a)||this.assets_gby_Scene.set(a,new Map);for(let e of s.keys())y.Log("%s load asset %s",i,e),y.Log("%s load asset %s",a,e),null===(n=this.assets_gby_Bundle.get(i))||void 0===n||n.set(e,s.get(e)),null===(r=this.assets_gby_Scene.get(a))||void 0===r||r.set(e,s.get(e)),this.config.SyncUrlAsset(o,e);t()}))}),(()=>{n()}))})).catch((e=>{s(e),n()}))}),(()=>{console.log("finished"),t(void 0)}))}))}get curSceneName(){return this.sceneName}Get(e,t){console.log(this.assets_gby_Scene);let s=this.GetPersist(e);return v(s)||(s=this.GetScene(e,null!=t?t:this.curSceneName)),s}GetPersist(e){var t;return null===(t=this.assets_gby_Scene.get("Persistence"))||void 0===t?void 0:t.get(e)}GetScene(e,t){var s;return null===(s=this.assets_gby_Scene.get(t))||void 0===s?void 0:s.get(e)}pullBundle(e){return new Promise(((t,s)=>{if(!this.bundles.has(e))return"resources"===e?(this.bundles.set("resources",a),void t(a)):void h.loadBundle(e,((n,i)=>{v(n)&&s("load bundle error"),v(i)||s("load bundle error"),this.bundles.set(e,i),t(i)}));t(this.bundles.get(e))}))}preloadDir(e,t,s){e.getDirWithPath(t,s).forEach((e=>{console.log(e.path)}))}loadResourceDir(e){return new Promise(((t,s)=>{let n=e.bundleName,i=e.path;this.pullBundle(n).then((n=>{n.loadDir(i,e.type,((e,i)=>{void 0!==e&&s(e);let r=new Map;null==i||i.forEach((e=>{let t=n.getAssetInfo(e._uuid).path.split("/").pop();void 0!==t&&r.set(t,e)})),t(r)}))})).catch(s)}))}};var k;E=M=I([w],E),function(e){e.Standalone="Standalone",e.Normal="Normal",e.Popup="Popup"}(k||(k={}));class D extends P{constructor(){super(...arguments),this.__uiType=k.Normal,this.isShowing=!1}get UIKey(){return this.__uiKey}get UIType(){return this.__uiType}get Actived(){return this.isShowing}spawned(){}onShow(){}onHide(){}handleShow(){this.isShowing=!0,this.showAction(),this.onShow()}handleHide(){this.isShowing=!1,this.hideAction(),this.onHide()}showAction(){this.node.active=!0}hideAction(){this.node.active=!1}}let L=class{constructor(){this.config={},this.uis=new Map}Load(e){return new Promise(((t,s)=>{if(v(e))return this.build(e),void t(this.config);a.load("configs/uis",l,((e,n)=>{void 0===e?(this.build(n),t(this.config)):s(e)}))}))}build(e){let t=e.json;this.config=t,Object.keys(this.config).reduce(((e,t)=>e.concat(this.config[t])),new Array).reduce(((e,t)=>e.set(t.name,t)),this.uis)}GetSceneUIs(e){return this.getPersistUIs().concat(this.customSceneUIs(e))}ConvertUIKeys2UINodeInfo(e){return e.map((e=>this.uis.get(e))).filter((e=>v(e)))}getPersistUIs(){return void 0===this.config.Persistence?[]:this.config.Persistence}customSceneUIs(e){return void 0===this.config[e]?[]:this.config[e]}};var x;L=I([w],L);const{ccclass:H,property:j,executionOrder:z}=d;let O=x=class extends e{constructor(){super(),this.config=new L,this.allSpawnedUICaches=new Map,this.standaloneUIs=new Map,this.normalUIs=new Map,this.popupUIs=new Array,Reflect.set(x,"Instance",this)}onLoad(){y.Warn(x.Instance)}initialize(e){return new Promise(((s,n)=>{this.StandaloneUIRoot=t("StandaloneUI",this.node),this.NormalUIRoot=t("NormalUI",this.node),this.PopupUIRoot=t("PopupUI",this.node),this.config.Load(e).then((e=>{s(void 0)}))}))}Get(e,t){return"string"==typeof e?this.getUI(e,(e=>{v(t)&&t(e)})):C.IsUIScriptRegistered(e)?this.getUI(C.GetUIClassRegisteredName(e),(e=>{v(t)&&t(e)})):null}Show(e,t){return"string"==typeof e?this.showUI(e,(e=>{v(t)&&t(e)})):C.IsUIScriptRegistered(e)?this.showUI(C.GetUIClassRegisteredName(e),(e=>{v(t)&&t(e)})):null}Hide(e,t){return"string"==typeof e?this.hideUI(e,(e=>{v(t)&&t(e)})):C.IsUIScriptRegistered(e)?this.hideUI(C.GetUIClassRegisteredName(e),(e=>{v(t)&&t(e)})):void 0}hideUI(e,t){let s=this.getUI(e);if(!v(s))return y.Warn("hide ui %s failed, ui not exists.",e),s;switch(s.UIType){case k.Standalone:this.hideStandaloneUI(e);break;case k.Normal:this.hideNormalUI(e);break;case k.Popup:this.hidePopupUI(e)}return t(s),s}showUI(e,t){let s=this.getUI(e);if(console.log(s),!v(s))return y.Warn("show ui %s failed, ui not exists.",e),s;console.log(s);let n=s.UIType;switch(console.log(n),n){case k.Standalone:this.showStandaloneUI(e);break;case k.Normal:this.showNormalUI(e);break;case k.Popup:this.showPopupUI(e)}return t(s),s}getUI(e,t){if(!this.allSpawnedUICaches.has(e))return null;let s=this.allSpawnedUICaches.get(e);return v(t)&&t(s),s}showStandaloneUI(e){let t=this.getUI(e);[...this.standaloneUIs.values()].filter((t=>t.UIKey!=e)).forEach((e=>{S(e,"handleHide")})),t.Actived||S(t,"handleShow"),this.standaloneUIs.has(e)&&this.standaloneUIs.set(e,t)}hideStandaloneUI(e){if(!this.standaloneUIs.has(e))return;let t=this.standaloneUIs.get(e);t.Actived&&(S(t,"handleHide"),this.standaloneUIs.delete(e));let s=Array.from(this.standaloneUIs.keys()).pop();v(s)&&S(this.standaloneUIs.get(s),"handleShow")}showNormalUI(e){if(this.normalUIs.has(e))return;let t=this.getUI(e);S(t,"handleShow"),this.normalUIs.set(e,t)}hideNormalUI(e){if(!this.normalUIs.has(e))return;S(this.normalUIs.get(e),"handleHide"),this.normalUIs.delete(e)}showPopupUI(e){let t=this.getUI(e);this.popupUIs.includes(t)?(this.popupUIs.splice(this.popupUIs.indexOf(t),1),this.popupUIs.push(t)):this.popupUIs.push(t),t.Actived||S(t,"handleShow");let s=t.node.parent?t.node.parent.children.length-1:0;t.node.setSiblingIndex(s)}hidePopupUI(e){if(this.popupUIs.length<=0)return;let t;if(v(e)){let s=this.allSpawnedUICaches.get(e);if(!v(s))return;if(!this.popupUIs.includes(s))return;t=s,this.popupUIs.splice(this.popupUIs.indexOf(t),1)}else t=this.popupUIs.pop();v(t)||S(t,"handleHide")}start(){}destroyUIs(e){Array.from(this.allSpawnedUICaches.keys()).filter((t=>e.includes(t))).map((e=>this.allSpawnedUICaches.get(e))).forEach((e=>{this.Hide(e.UIKey),e.destroy(),this.allSpawnedUICaches.delete(e.UIKey)})),Array.from(this.standaloneUIs.keys()).filter((t=>e.includes(t))).forEach((e=>{this.standaloneUIs.delete(e)})),Array.from(this.normalUIs.keys()).filter((t=>e.includes(t))).forEach((e=>{this.normalUIs.delete(e)})),this.popupUIs.filter((t=>e.includes(t.UIKey))).forEach((e=>{this.popupUIs.splice(this.popupUIs.indexOf(e),1)}))}onEnterScene(e){this.sceneName=e;let t=this.config.GetSceneUIs(e).map((e=>e.name)),s=Array.from(this.allSpawnedUICaches.keys()),n=s.filter((e=>!t.includes(e)));this.destroyUIs(n);let i=t.filter((e=>!s.includes(e)));console.warn(t,s,i),this.spawnUIs(this.config.ConvertUIKeys2UINodeInfo(i))}spawnUIs(e){e.forEach((e=>{this.spawnUI(e)}))}spawnUI(e){var t,s,n;let i=e.name,r=null!==(t=e.script)&&void 0!==t?t:i,o=null!==(s=e.asset)&&void 0!==s?s:i,a=null!==(n=e.type)&&void 0!==n?n:k.Normal;C.IsUIScriptRegistered(r)||console.warn("No ui script registered for ui %s",r);let l=E.Instance.Get(o,this.sceneName);if(this.allSpawnedUICaches.has(i))return;if(!v(l))return void console.log("can not find asset %s",o);l=l;const c=u(l);c.parent=this.getParentNode(a);let h=c.addComponent(C.GetUIScriptConstructor(r));S(h,"spawned"),Reflect.set(h,"__uiKey",i),Reflect.set(h,"__uiType",a),h.node.active=!1,this.allSpawnedUICaches.set(i,h)}getParentNode(e){return"Normal"===e?this.NormalUIRoot:"Standalone"===e?this.StandaloneUIRoot:"Popup"===e?this.PopupUIRoot:null}};O=x=I([H,z(-1001)],O),console.log("require ui manager");let K=class{constructor(){this.sceneName="",this.scripts=new Map,this.SceneName="SceneEntry"}set SceneName(e){this.sceneName=e;let t=`${this.sceneName}Script`;if(!C.IsSceneScriptRegistered(t))return;let s=C.GetSceneScriptConstrutor(t);this.scripts.set(this.sceneName,new s)}InvokeStartDelegate(){this.invoke("start")}invoke(e,...t){if(!this.scripts.get(this.sceneName))return;let s=this.scripts.get(this.sceneName),n=Reflect.get(s,e);void 0!==n&&Reflect.apply(n,s,[])}};var T;K=I([w],K);let F=T=class{constructor(){this.resConfig=new A,this.scriptManager=new K,this.sceneName="SceneEntry",Reflect.set(T,"Instance",this)}get SceneName(){return this.sceneName}setSceneName(e){this.sceneName=e,this.scriptManager.SceneName=e,Reflect.set(E.Instance,"sceneName",this.sceneName)}initialize(){this.setSceneName("SceneEntry"),this.Load("SceneEntry")}Load(e,t,s){y.Log("开始加载场景 %s",e),E.Instance.loadScene(e,((e,s,n)=>{v(t)&&t(e/s)}),((n,i)=>{y.Log("场景加载完成..",O.Instance),E.Instance.LoadSceneRes([e]).then((()=>{S(O.Instance,"onEnterScene",e),this.setSceneName(e),this.scriptManager.InvokeStartDelegate(),this.onSceneLoaded(e),v(t)&&t(1),v(s)&&s()}))}))}onSceneLoaded(e){}};F=T=I([w],F);class W{}W.UI=O.Instance,W.Resource=new E,W.Scene=new F;const{ccclass:Y,property:q,executionOrder:$}=d;let J=class extends P{constructor(){super(...arguments),this.resConfig=null,this.uiConfig=null,this.initializeFunction="initialize"}onLoad(){p.addPersistRootNode(this.node),this.initialize()}initialize(){var e;let t=null===(e=this.Get("UIRoot"))||void 0===e?void 0:e.addComponent(O);Reflect.set(W,"UI",t),S(W.Resource,this.initializeFunction,this.resConfig).then((()=>{S(t,this.initializeFunction,this.uiConfig).then((()=>{S(W.Scene,this.initializeFunction)}))}))}start(){}};I([q({type:l,tooltip:"资源配置文件, 默认加载 resources/configs/res.json"})],J.prototype,"resConfig",void 0),I([q({type:l,tooltip:"UI配置文件, 默认加载 resources/configs/uis.json"})],J.prototype,"uiConfig",void 0),J=I([Y("CCHelperEntry"),$(-1e3)],J);class Q{static get IsBrowser(){var e;return null!==(e=g.isBrowser)&&void 0!==e&&e}}export{P as BaseComponent,J as CCHelperEntry,R as ISceneScript,W as Managements,C as MetaData,N as PersistSceneName,Q as Platform,E as ResourceManager,F as SceneManager,b as StartSceneName,D as UIBase,O as UIManager,k as UIType,G as mapString2CCAssetType,B as scene_script,_ as ui_script};
+***************************************************************************** */
+
+function __decorate(decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+}
+
+function o(r,t,...e){if("function"==typeof r)return Reflect.apply(r,t,e);if("object"==typeof r){let n=Reflect.get(r,t,e);if(void 0===n)return;return o(n,r,...e)}return null}function e(r,t,o){let e=0,n=()=>{++e>=r.length&&o();};for(let o of r)t(o,n);}class n{static Register(r){r.info&&(this.info=r.info),r.warn&&(this.warn=r.warn),r.error&&(this.error=r.error);}static Log(r,...t){n.doLogger(this.info,r,...t);}static Warn(r,...t){n.doLogger(this.warn,r,...t);}static Error(r,...t){n.doLogger(this.error,r,...t);}static doLogger(t,o,...e){let n=r().format("YYYY-MM-DD HH:mm:ss.SSS")+": ";"string"==typeof o?t(n+o,...e):t(n,o);}}n.info=console.log,n.warn=console.warn,n.error=console.error;const c=Symbol(),i=r=>new Proxy(r,{construct:(r,t,o)=>r.prototype!==o.prototype?Reflect.construct(r,t,o):(r[c]||(r[c]=Reflect.construct(r,t,o)),r[c])});function f(r){return null!=r}
+
+const PersistSceneName = 'Persistence';
+const StartSceneName = 'SceneEntry';
+class ISceneScript {
+}
+class MetaData {
+    static IsSceneScriptRegistered(scriptName) {
+        return this.sceneScriptClasses.has(scriptName);
+    }
+    static GetSceneScriptConstrutor(scriptName) {
+        var _a;
+        if (!this.IsSceneScriptRegistered(scriptName))
+            return null;
+        return (_a = this.sceneScriptClasses.get(scriptName)) !== null && _a !== void 0 ? _a : null;
+    }
+    static IsUIScriptRegistered(target) {
+        if (typeof target === "string")
+            return this.uiScriptClasses.has(target);
+        let _className = target.prototype.constructor.name;
+        if (!this.uiClassNamesMap.has(_className))
+            return false;
+        return this.uiScriptClasses.has(this.uiClassNamesMap.get(_className));
+    }
+    static GetUIScriptConstructor(scriptName) {
+        var _a;
+        return (_a = this.uiScriptClasses.get(scriptName)) !== null && _a !== void 0 ? _a : null;
+    }
+    static GetUIClassRegisteredName(uiScriptConstructor) {
+        var _a;
+        return (_a = this.uiClassNamesMap.get(uiScriptConstructor.prototype.constructor.name)) !== null && _a !== void 0 ? _a : null;
+    }
+}
+MetaData.sceneScriptClasses = new Map();
+MetaData.uiClassNamesMap = new Map();
+MetaData.uiScriptClasses = new Map();
+/**
+ * 注册UI脚本
+ * @param className 脚本名称
+ */
+const ui_script = (className) => (target) => {
+    o(Reflect.get(MetaData, "uiClassNamesMap"), "set", target.prototype.constructor.name, className);
+    o(Reflect.get(MetaData, "uiScriptClasses"), "set", className, target);
+};
+/**
+ * 注册场景脚本
+ * @param classname 场景脚本名称
+ */
+const scene_script = (classname) => (target) => {
+    o(Reflect.get(MetaData, "sceneScriptClasses"), "set", classname, target);
+};
+
+class BaseComponent extends Component {
+    Get(path, classConstructor) {
+        if (classConstructor === undefined) {
+            return find(path, this.node);
+        }
+        var _node = find(path, this.node);
+        if (_node === null)
+            return null;
+        return _node.getComponent(classConstructor);
+    }
+}
+function mapString2CCAssetType(classname) {
+    let _ccclass = Asset;
+    switch (classname) {
+        case 'Prefab':
+            _ccclass = Prefab;
+            break;
+        case 'SpriteFrame':
+            _ccclass = SpriteFrame;
+            break;
+        case 'Texture2D':
+            _ccclass = Texture2D;
+            break;
+        case 'Material':
+            _ccclass = Material;
+            break;
+    }
+    return _ccclass;
+}
+
+let ResConfig = class ResConfig {
+    constructor() {
+        /**
+         * 资源配置
+         */
+        this.config = {};
+        /**
+         * 资源url与场景名称的映射
+         */
+        this.pathsGroupByScene = new Map();
+        /**
+         * 资源url与url文件夹下的资源列表关系映射
+         */
+        this.assetsGroupByUrl = new Map();
+    }
+    Load(asset) {
+        return new Promise((resolve, reject) => {
+            if (f(asset)) {
+                this.build(asset);
+                resolve(this.config);
+                return;
+            }
+            resources.load("configs/res", JsonAsset, (_error, _data) => {
+                if (_error !== undefined) {
+                    reject(_error);
+                    return;
+                }
+                this.build(_data);
+                resolve(this.config);
+            });
+        });
+    }
+    build(asset) {
+        let _obj = asset.json;
+        this.config = _obj;
+        this.buildPathesGroupByScene();
+    }
+    IsAutoRelease(sceneName) {
+        var _a;
+        return (_a = this.config[sceneName].autoRelease) !== null && _a !== void 0 ? _a : false;
+    }
+    SyncUrlAsset(url, assetKey) {
+        if (!this.assetsGroupByUrl.has(url))
+            this.assetsGroupByUrl.set(url, new Set());
+        this.assetsGroupByUrl.get(url).add(assetKey);
+    }
+    GetAssetNamesByUrl(url) {
+        if (!this.assetsGroupByUrl.has(url))
+            return [];
+        return Array.from(this.assetsGroupByUrl.get(url));
+    }
+    GetSceneInfo(sceneName) {
+        return this.config[sceneName];
+    }
+    /**
+     *
+     * @param 获取指定场景下的资源包名称
+     */
+    getBundles(scene) {
+        let _node = this.config[scene];
+        if (_node === undefined)
+            return [];
+        return Array.from(new Set(_node.assets.map(_ => this.buildAssetDirInfo(_).bundleName)));
+    }
+    /**
+     *
+     * @param sceneNames 获取多个场景下的资源包 默认包含Persistence场景资源
+     */
+    getScenesBundles(sceneNames) {
+        return Array.from(new Set(sceneNames.reduce((_bundles, _sceneName) => _bundles.concat(this.getBundles(_sceneName)), this.getBundles(PersistSceneName))));
+    }
+    /**
+     * 获取scene场景下所有文件夹信息
+     * @param scene
+     */
+    getSceneDirs(scene) {
+        let _node = this.config[scene];
+        if (_node === undefined)
+            return [];
+        return _node.assets.map(_ => this.buildAssetDirInfo(_));
+    }
+    /**
+     * 获取scene场景下 bundleName包 的所有文件夹信息
+     * @param scene
+     * @param bundleName
+     */
+    getBundleDirs(scene, bundleName) {
+        let _node = this.config[scene];
+        if (_node === undefined)
+            return [];
+        return this.getSceneDirs(scene)
+            .filter(_assetUrl => _assetUrl.bundleName === bundleName);
+    }
+    /**
+     * 获取多场景下的某个bundle 对应的文件夹列表  (默认包含Persistence场景)
+     * @param sceneNames 场景名称
+     * @param bundleName 包名
+     */
+    getScenesBundleDirs(sceneNames, bundleName) {
+        return sceneNames.reduce((_dirs, _sceneName) => _dirs.concat(this.getBundleDirs(_sceneName, bundleName)), this.getBundleDirs(PersistSceneName, bundleName));
+    }
+    /**
+     *
+     * @param url example  'resources://prefabs/uis'
+     */
+    buildAssetDirInfo(dirNode) {
+        let _url = dirNode.url;
+        let _bundleRegex = /.*\:\/\//;
+        let _result = _bundleRegex.exec(_url);
+        if (_result === null)
+            return null;
+        let _bundleName = _result[0].slice(0, -3);
+        let _pathRegex = /\:\/\/.*/;
+        _result = _pathRegex.exec(_url);
+        if (_result === null)
+            return null;
+        let _path = _result[0].slice(3);
+        return {
+            sceneName: this.GetSceneNameByUrl(_url),
+            url: _url,
+            bundleName: _bundleName,
+            path: _path,
+            type: mapString2CCAssetType(dirNode.type)
+        };
+    }
+    GetSceneNameByUrl(url) {
+        var _a;
+        return (_a = this.pathsGroupByScene.get(url)) !== null && _a !== void 0 ? _a : PersistSceneName;
+    }
+    buildPathesGroupByScene() {
+        this.pathsGroupByScene.clear();
+        Object.keys(this.config).forEach(_scene => {
+            var _sceneAssets = this.config[_scene];
+            _sceneAssets.assets.forEach(_dir => {
+                this.pathsGroupByScene.set(_dir.url, _scene);
+            });
+        });
+    }
+};
+ResConfig = __decorate([
+    i
+], ResConfig);
+
+var ResourceManager_1;
+let ResourceManager = ResourceManager_1 = class ResourceManager {
+    constructor() {
+        //config:ResConfig = {};
+        // 按照 bundle 名称分组资源
+        this.assets_gby_Bundle = new Map();
+        // 按照场景名称 分组资源
+        this.assets_gby_Scene = new Map();
+        this.bundles = new Map();
+        this.config = new ResConfig();
+        this.sceneName = "";
+        Reflect.set(ResourceManager_1, "Instance", this);
+    }
+    /**
+     * 初始化
+     */
+    initialize(asset) {
+        return new Promise((resolve, reject) => {
+            this.config.Load(asset).then(_config => {
+                resolve(undefined);
+            }).catch();
+        });
+    }
+    loadScene(sceneName, progress, launched) {
+        if (sceneName === StartSceneName) {
+            progress(1, 1, undefined);
+            launched(null, undefined);
+            return;
+        }
+        let _sceneInfo = this.config.GetSceneInfo(sceneName);
+        let _bundleName = _sceneInfo.bundle;
+        if (!f(_sceneInfo.bundle)) {
+            director.preloadScene(sceneName, (completedCount, totalCount, item) => {
+                progress(completedCount, totalCount, item);
+            }, (error, sceneAsset) => {
+                director.loadScene(sceneName, launched);
+            });
+            return;
+        }
+        this.pullBundle(_bundleName).then(_bundle => {
+            _bundle.loadScene(sceneName, (completedCount, totalCount, item) => {
+                progress(completedCount, totalCount, item);
+            }, (error, sceneAsset) => {
+                director.loadScene(sceneName, launched);
+            });
+        });
+    }
+    LoadSceneRes(sceneNames) {
+        return new Promise((resolve, reject) => {
+            this.unloadSceneRes(this.curSceneName);
+            this.loadNewSceneRes(sceneNames).then(() => {
+                resolve(undefined);
+            }).catch(reject);
+        });
+    }
+    unloadSceneRes(sceneName) {
+        console.log("unload scene %s", sceneName);
+        if (!this.config.IsAutoRelease(sceneName))
+            return;
+        // 要卸载哪些文件夹?
+        let _sceneDirs = this.config.getSceneDirs(sceneName);
+        _sceneDirs.forEach(_assetDir => {
+            var _a;
+            (_a = this.bundles.get(_assetDir.bundleName)) === null || _a === void 0 ? void 0 : _a.release(_assetDir.path, _assetDir.type);
+        });
+        let _releasedAssetKeys = _sceneDirs.map(_dir => _dir.url)
+            .reduce((_assetsNames, _url) => this.config.GetAssetNamesByUrl(_url), new Array());
+        let _sceneBundles = this.config.getBundles(sceneName);
+        // 同步bundles资源映射
+        Array.from(this.assets_gby_Bundle.keys()).filter(_bundleKey => _sceneBundles.includes(_bundleKey)).forEach(_bundleName => {
+            Array.from(this.assets_gby_Bundle.get(_bundleName).keys())
+                .filter(_assetKey => _releasedAssetKeys.includes(_assetKey))
+                .forEach(_assetKey => {
+                this.assets_gby_Bundle.get(_bundleName).delete(_assetKey);
+                console.log("移除%s包 %s资源", _bundleName, _assetKey);
+            });
+        });
+        // 同步场景资源映射
+        if (!this.assets_gby_Scene.has(sceneName))
+            return;
+        Array.from(this.assets_gby_Scene.get(sceneName).keys()).forEach(_assetKey => {
+            if (!_releasedAssetKeys.includes(_assetKey))
+                return;
+            this.assets_gby_Scene.get(sceneName).delete(_assetKey);
+            console.log("移除%s场景 %s资源", sceneName, _assetKey);
+        });
+    }
+    loadNewSceneRes(sceneNames) {
+        return new Promise((resolve, reject) => {
+            console.log("加载自定义场景资源: ", sceneNames[0]);
+            let _bundles = this.config.getScenesBundles(sceneNames);
+            console.log("包列表", _bundles);
+            // Start load bundles
+            e(_bundles, (_key, _finishLoadBundleStep) => {
+                let _bundleName = _key;
+                this.pullBundle(_bundleName).then(_bundle => {
+                    /// Start 加载bundle下的文件夹
+                    e(this.config.getScenesBundleDirs(sceneNames, _bundleName), (_assetDir, _loadDirStepFinished) => {
+                        this.loadResourceDir(_assetDir).then(assetsMap => {
+                            var _a, _b;
+                            let _resUrl = _assetDir.url;
+                            let _resSceneKey = _assetDir.sceneName;
+                            if (!this.assets_gby_Bundle.has(_bundleName)) {
+                                this.assets_gby_Bundle.set(_bundleName, new Map());
+                            }
+                            if (!this.assets_gby_Scene.has(_resSceneKey)) {
+                                this.assets_gby_Scene.set(_resSceneKey, new Map());
+                            }
+                            for (let _key of assetsMap.keys()) {
+                                n.Log("%s load asset %s", _bundleName, _key);
+                                n.Log("%s load asset %s", _resSceneKey, _key);
+                                (_a = this.assets_gby_Bundle.get(_bundleName)) === null || _a === void 0 ? void 0 : _a.set(_key, assetsMap.get(_key));
+                                (_b = this.assets_gby_Scene.get(_resSceneKey)) === null || _b === void 0 ? void 0 : _b.set(_key, assetsMap.get(_key));
+                                this.config.SyncUrlAsset(_resUrl, _key);
+                            }
+                            _loadDirStepFinished();
+                        });
+                    }, () => {
+                        _finishLoadBundleStep();
+                    });
+                    ///  End
+                }).catch(error => {
+                    reject(error);
+                    _finishLoadBundleStep();
+                });
+            }, () => {
+                console.log('finished');
+                resolve(undefined);
+            });
+            // End load bundles
+        });
+    }
+    get curSceneName() {
+        return this.sceneName;
+    }
+    Get(key, sceneName) {
+        console.log(this.assets_gby_Scene);
+        let _asset = this.GetPersist(key);
+        if (!f(_asset))
+            _asset = this.GetScene(key, sceneName !== null && sceneName !== void 0 ? sceneName : this.curSceneName);
+        return _asset;
+    }
+    GetPersist(key) {
+        var _a;
+        return (_a = this.assets_gby_Scene.get(PersistSceneName)) === null || _a === void 0 ? void 0 : _a.get(key);
+    }
+    GetScene(key, sceneName) {
+        var _a;
+        return (_a = this.assets_gby_Scene.get(sceneName)) === null || _a === void 0 ? void 0 : _a.get(key);
+    }
+    pullBundle(bundleName) {
+        return new Promise((resolve, reject) => {
+            if (this.bundles.has(bundleName)) {
+                resolve(this.bundles.get(bundleName));
+                return;
+            }
+            else if (bundleName === 'resources') {
+                this.bundles.set("resources", resources);
+                resolve(resources);
+                return;
+            }
+            assetManager.loadBundle(bundleName, (_error, _bundle) => {
+                if (f(_error))
+                    reject('load bundle error');
+                if (!f(_bundle))
+                    reject('load bundle error');
+                this.bundles.set(bundleName, _bundle);
+                resolve(_bundle);
+            });
+        });
+    }
+    preloadDir(bundle, dir, type) {
+        let _pathes = bundle.getDirWithPath(dir, type);
+        _pathes.forEach(_path => {
+            console.log(_path.path);
+        });
+    }
+    loadResourceDir(assetDir) {
+        return new Promise((resolve, reject) => {
+            let _bundleName = assetDir.bundleName;
+            let _resPath = assetDir.path;
+            this.pullBundle(_bundleName).then(_bundle => {
+                _bundle.loadDir(_resPath, assetDir.type, (_error, _data) => {
+                    if (_error !== undefined) {
+                        reject(_error);
+                    }
+                    let _res = new Map();
+                    _data === null || _data === void 0 ? void 0 : _data.forEach(_item => {
+                        let _info = _bundle.getAssetInfo(_item._uuid);
+                        let _name = _info.path.split('/').pop();
+                        if (_name === undefined)
+                            return;
+                        _res.set(_name, _item);
+                    });
+                    resolve(_res);
+                });
+            }).catch(reject);
+        });
+    }
+};
+ResourceManager = ResourceManager_1 = __decorate([
+    i
+], ResourceManager);
+
+var UIType;
+(function (UIType) {
+    UIType["Standalone"] = "Standalone";
+    UIType["Normal"] = "Normal";
+    UIType["Popup"] = "Popup";
+})(UIType || (UIType = {}));
+class UIBase extends BaseComponent {
+    constructor() {
+        super(...arguments);
+        this.__uiType = UIType.Normal;
+        this.isShowing = false;
+    }
+    get UIKey() { return this.__uiKey; }
+    get UIType() { return this.__uiType; }
+    get Actived() { return this.isShowing; }
+    spawned() { }
+    onShow() { }
+    onHide() { }
+    handleShow() {
+        this.isShowing = true;
+        this.showAction();
+        this.onShow();
+    }
+    handleHide() {
+        this.isShowing = false;
+        this.hideAction();
+        this.onHide();
+    }
+    showAction() {
+        this.node.active = true;
+    }
+    hideAction() {
+        this.node.active = false;
+    }
+}
+
+let UIConfig = class UIConfig {
+    constructor() {
+        this.config = {};
+        this.uis = new Map();
+    }
+    Load(asset) {
+        return new Promise((resolve, reject) => {
+            if (f(asset)) {
+                this.build(asset);
+                resolve(this.config);
+                return;
+            }
+            resources.load("configs/uis", JsonAsset, (_error, _data) => {
+                if (_error !== undefined) {
+                    reject(_error);
+                    return;
+                }
+                this.build(_data);
+                resolve(this.config);
+            });
+        });
+    }
+    build(asset) {
+        let _obj = asset.json;
+        this.config = _obj;
+        Object.keys(this.config)
+            .reduce((_uis, _sceneKey) => _uis.concat(this.config[_sceneKey]), new Array())
+            .reduce((_uis, _uiNode) => _uis.set(_uiNode.name, _uiNode), this.uis);
+    }
+    GetSceneUIs(sceneName) {
+        return this.getPersistUIs().concat(this.customSceneUIs(sceneName));
+    }
+    ConvertUIKeys2UINodeInfo(keys) {
+        return keys.map(_key => this.uis.get(_key)).filter(_ui => f(_ui));
+    }
+    getPersistUIs() {
+        if (this.config[PersistSceneName] === undefined)
+            return [];
+        return this.config[PersistSceneName];
+    }
+    customSceneUIs(sceneName) {
+        if (this.config[sceneName] === undefined)
+            return [];
+        return this.config[sceneName];
+    }
+};
+UIConfig = __decorate([
+    i
+], UIConfig);
+
+var UIManager_1;
+const { ccclass, executionOrder } = _decorator;
+let UIManager = UIManager_1 = class UIManager extends Component {
+    constructor() {
+        super();
+        this.config = new UIConfig();
+        this.allSpawnedUICaches = new Map();
+        // 实时 UI 数据
+        this.standaloneUIs = new Map();
+        this.normalUIs = new Map();
+        this.popupUIs = new Array();
+        Reflect.set(UIManager_1, "Instance", this);
+    }
+    onLoad() {
+        n.Warn(UIManager_1.Instance);
+    }
+    initialize(asset) {
+        return new Promise((resolve, reject) => {
+            this.StandaloneUIRoot = find("StandaloneUI", this.node);
+            this.NormalUIRoot = find("NormalUI", this.node);
+            this.PopupUIRoot = find("PopupUI", this.node);
+            this.config.Load(asset).then(_config => {
+                resolve(undefined);
+            });
+        });
+    }
+    Get(UIKey, callback) {
+        if (typeof UIKey === "string") {
+            return this.getUI(UIKey, _ui => {
+                if (f(callback))
+                    callback(_ui);
+            });
+        }
+        if (!MetaData.IsUIScriptRegistered(UIKey))
+            return null;
+        return this.getUI(MetaData.GetUIClassRegisteredName(UIKey), _ui => {
+            if (f(callback))
+                callback(_ui);
+        });
+    }
+    Show(UIKey, callback) {
+        if (typeof UIKey === 'string') {
+            return this.showUI(UIKey, _ui => {
+                if (f(callback))
+                    callback(_ui);
+            });
+        }
+        if (!MetaData.IsUIScriptRegistered(UIKey))
+            return null;
+        return this.showUI(MetaData.GetUIClassRegisteredName(UIKey), _ui => {
+            if (f(callback))
+                callback(_ui);
+        });
+    }
+    Hide(UIKey, callback) {
+        if (typeof UIKey === "string") {
+            return this.hideUI(UIKey, _ui => {
+                if (f(callback))
+                    callback(_ui);
+            });
+        }
+        if (!MetaData.IsUIScriptRegistered(UIKey))
+            return;
+        return this.hideUI(MetaData.GetUIClassRegisteredName(UIKey), _ui => {
+            if (f(callback))
+                callback(_ui);
+        });
+    }
+    hideUI(UIKey, callback) {
+        let _uiComponent = this.getUI(UIKey);
+        if (!f(_uiComponent)) {
+            n.Warn("hide ui %s failed, ui not exists.", UIKey);
+            return _uiComponent;
+        }
+        let _uiType = _uiComponent.UIType;
+        switch (_uiType) {
+            case UIType.Standalone:
+                this.hideStandaloneUI(UIKey);
+                break;
+            case UIType.Normal:
+                this.hideNormalUI(UIKey);
+                break;
+            case UIType.Popup:
+                this.hidePopupUI(UIKey);
+                break;
+        }
+        callback(_uiComponent);
+        return _uiComponent;
+    }
+    showUI(UIKey, callback) {
+        let _uiComponent = this.getUI(UIKey);
+        console.log(_uiComponent);
+        if (!f(_uiComponent)) {
+            n.Warn("show ui %s failed, ui not exists.", UIKey);
+            return _uiComponent;
+        }
+        console.log(_uiComponent);
+        let _uiType = _uiComponent.UIType;
+        console.log(_uiType);
+        switch (_uiType) {
+            case UIType.Standalone:
+                this.showStandaloneUI(UIKey);
+                break;
+            case UIType.Normal:
+                this.showNormalUI(UIKey);
+                break;
+            case UIType.Popup:
+                this.showPopupUI(UIKey);
+                break;
+        }
+        callback(_uiComponent);
+        return _uiComponent;
+    }
+    getUI(UIKey, callback) {
+        if (!this.allSpawnedUICaches.has(UIKey))
+            return null;
+        let _uiComponent = this.allSpawnedUICaches.get(UIKey);
+        if (f(callback))
+            callback(_uiComponent);
+        return _uiComponent;
+    }
+    showStandaloneUI(uiKey) {
+        let _uiComponent = this.getUI(uiKey);
+        [...this.standaloneUIs.values()].filter(_ui => _ui.UIKey != uiKey).forEach(_ui => {
+            o(_ui, "handleHide");
+        });
+        if (!_uiComponent.Actived)
+            o(_uiComponent, "handleShow");
+        if (this.standaloneUIs.has(uiKey))
+            this.standaloneUIs.set(uiKey, _uiComponent);
+    }
+    hideStandaloneUI(uiKey) {
+        if (!this.standaloneUIs.has(uiKey))
+            return;
+        let _uiComponent = this.standaloneUIs.get(uiKey);
+        if (_uiComponent.Actived) {
+            o(_uiComponent, "handleHide");
+            this.standaloneUIs.delete(uiKey);
+        }
+        let _lastUIKey = Array.from(this.standaloneUIs.keys()).pop();
+        if (!f(_lastUIKey))
+            return;
+        o(this.standaloneUIs.get(_lastUIKey), "handleShow");
+    }
+    showNormalUI(uiKey) {
+        if (this.normalUIs.has(uiKey))
+            return;
+        let _uiComponent = this.getUI(uiKey);
+        o(_uiComponent, "handleShow");
+        this.normalUIs.set(uiKey, _uiComponent);
+    }
+    hideNormalUI(uiKey) {
+        if (!this.normalUIs.has(uiKey))
+            return;
+        let _uiComponent = this.normalUIs.get(uiKey);
+        o(_uiComponent, "handleHide");
+        this.normalUIs.delete(uiKey);
+    }
+    showPopupUI(uiKey) {
+        let _uiComponent = this.getUI(uiKey);
+        if (!this.popupUIs.includes(_uiComponent)) {
+            this.popupUIs.push(_uiComponent);
+        }
+        else {
+            this.popupUIs.splice(this.popupUIs.indexOf(_uiComponent), 1);
+            this.popupUIs.push(_uiComponent);
+        }
+        if (!_uiComponent.Actived) {
+            o(_uiComponent, "handleShow");
+        }
+        let _lastSibilingIndex = _uiComponent.node.parent ? _uiComponent.node.parent.children.length - 1 : 0;
+        _uiComponent.node.setSiblingIndex(_lastSibilingIndex);
+    }
+    hidePopupUI(uiKey) {
+        if (this.popupUIs.length <= 0)
+            return;
+        let _uiComponent;
+        if (f(uiKey)) {
+            let _spawnedUI = this.allSpawnedUICaches.get(uiKey);
+            if (!f(_spawnedUI))
+                return;
+            if (!this.popupUIs.includes(_spawnedUI))
+                return;
+            _uiComponent = _spawnedUI;
+            this.popupUIs.splice(this.popupUIs.indexOf(_uiComponent), 1);
+        }
+        else
+            _uiComponent = this.popupUIs.pop();
+        if (f(_uiComponent))
+            return;
+        o(_uiComponent, "handleHide");
+    }
+    start() {
+    }
+    destroyUIs(uis) {
+        // 销毁UI
+        Array.from(this.allSpawnedUICaches.keys())
+            .filter(_uiKey => uis.includes(_uiKey))
+            .map(_uiKey => this.allSpawnedUICaches.get(_uiKey))
+            .forEach(_ui => {
+            this.Hide(_ui.UIKey);
+            _ui.destroy();
+            this.allSpawnedUICaches.delete(_ui.UIKey);
+        });
+        Array.from(this.standaloneUIs.keys()).filter(_uiKey => uis.includes(_uiKey))
+            .forEach(_uiKey => {
+            this.standaloneUIs.delete(_uiKey);
+        });
+        Array.from(this.normalUIs.keys()).filter(_uiKey => uis.includes(_uiKey))
+            .forEach(_uiKey => {
+            this.normalUIs.delete(_uiKey);
+        });
+        this.popupUIs
+            .filter(_ui => uis.includes(_ui.UIKey))
+            .forEach(_ui => {
+            this.popupUIs.splice(this.popupUIs.indexOf(_ui), 1);
+        });
+    }
+    onEnterScene(sceneName) {
+        /**
+         * 销毁上一场景UI   -> 创建当前场景UI
+         */
+        this.sceneName = sceneName;
+        let _allUIs = this.config.GetSceneUIs(sceneName);
+        let _newUIs = _allUIs.map(_ui => _ui.name);
+        let _currentUIs = Array.from(this.allSpawnedUICaches.keys());
+        let _prepare2DestroyUIs = _currentUIs.filter(_ui => !_newUIs.includes(_ui));
+        this.destroyUIs(_prepare2DestroyUIs);
+        let _prepare2SpawnUIs = _newUIs.filter(_ui => !_currentUIs.includes(_ui));
+        console.warn(_newUIs, _currentUIs, _prepare2SpawnUIs);
+        this.spawnUIs(this.config.ConvertUIKeys2UINodeInfo(_prepare2SpawnUIs));
+    }
+    spawnUIs(uis) {
+        uis.forEach(_ui => {
+            this.spawnUI(_ui);
+        });
+    }
+    spawnUI(uiInfo) {
+        var _a, _b, _c;
+        let _uiKey = uiInfo.name;
+        let _uiScript = (_a = uiInfo.script) !== null && _a !== void 0 ? _a : _uiKey;
+        let _assetName = (_b = uiInfo.asset) !== null && _b !== void 0 ? _b : _uiKey;
+        let _uiType = (_c = uiInfo.type) !== null && _c !== void 0 ? _c : UIType.Normal;
+        if (!MetaData.IsUIScriptRegistered(_uiScript)) {
+            console.warn("No ui script registered for ui %s", _uiScript);
+        }
+        let _uiPrefab = ResourceManager.Instance.Get(_assetName, this.sceneName);
+        if (this.allSpawnedUICaches.has(_uiKey))
+            return;
+        if (!f(_uiPrefab)) {
+            console.log("can not find asset %s", _assetName);
+            return;
+        }
+        _uiPrefab = _uiPrefab;
+        const _uiNode = instantiate(_uiPrefab);
+        _uiNode.parent = this.getParentNode(_uiType);
+        let _component = _uiNode.addComponent(MetaData.GetUIScriptConstructor(_uiScript));
+        o(_component, "spawned");
+        Reflect.set(_component, "__uiKey", _uiKey);
+        Reflect.set(_component, "__uiType", _uiType);
+        _component.node.active = false;
+        this.allSpawnedUICaches.set(_uiKey, _component);
+    }
+    getParentNode(uiType) {
+        if (uiType === "Normal") {
+            return this.NormalUIRoot;
+        }
+        else if (uiType === "Standalone") {
+            return this.StandaloneUIRoot;
+        }
+        else if (uiType === "Popup") {
+            return this.PopupUIRoot;
+        }
+        return null;
+    }
+};
+UIManager = UIManager_1 = __decorate([
+    ccclass,
+    executionOrder(-1001)
+], UIManager);
+
+class EventBase {
+}
+class SYS_UPDATE extends EventBase {
+}
+class SYS_START extends EventBase {
+}
+let EventManager = class EventManager {
+    Register(eventHandler) {
+        console.log("!!!!!!!!!!! Register !!!!!!!!!!!!!!!!!!");
+        console.log(eventHandler);
+    }
+    Unregister(eventHandler) {
+    }
+    initialize() {
+    }
+};
+EventManager = __decorate([
+    i
+], EventManager);
+
+let SceneScriptManager = class SceneScriptManager {
+    constructor() {
+        this.sceneName = '';
+        this.scripts = new Map();
+        this.SceneName = StartSceneName;
+    }
+    set SceneName(value) {
+        this.sceneName = value;
+        let _sceneScriptName = `${this.sceneName}Script`;
+        if (!MetaData.IsSceneScriptRegistered(_sceneScriptName))
+            return;
+        let _sceneScriptConstructor = MetaData.GetSceneScriptConstrutor(_sceneScriptName);
+        this.scripts.set(this.sceneName, new _sceneScriptConstructor());
+    }
+    InvokeStartDelegate() {
+        this.invoke('start');
+    }
+    invoke(funcName, ...args) {
+        if (!this.scripts.get(this.sceneName))
+            return;
+        let _sceneScript = this.scripts.get(this.sceneName);
+        let _func = Reflect.get(_sceneScript, funcName);
+        if (_func !== undefined) {
+            Reflect.apply(_func, _sceneScript, []);
+        }
+    }
+};
+SceneScriptManager = __decorate([
+    i
+], SceneScriptManager);
+
+var SceneManager_1;
+let SceneManager = SceneManager_1 = class SceneManager {
+    constructor() {
+        this.resConfig = new ResConfig();
+        this.scriptManager = new SceneScriptManager();
+        this.sceneName = StartSceneName;
+        Reflect.set(SceneManager_1, "Instance", this);
+    }
+    get SceneName() {
+        return this.sceneName;
+    }
+    setSceneName(val) {
+        this.sceneName = val;
+        this.scriptManager.SceneName = val;
+        Reflect.set(ResourceManager.Instance, "sceneName", this.sceneName);
+    }
+    initialize() {
+        this.setSceneName(StartSceneName);
+        this.Load(StartSceneName);
+    }
+    Load(sceneName, progress, completed) {
+        /**
+         * 预加载 场景 -> 加载场景  -> 加载场景资源 -> UI资源处理-> 场景加载完成
+         */
+        n.Log("开始加载场景 %s", sceneName);
+        ResourceManager.Instance.loadScene(sceneName, (completedcount, totalCount, item) => {
+            if (f(progress))
+                progress(completedcount / totalCount);
+        }, (error, sceneAsset) => {
+            // 
+            n.Log("场景加载完成..", UIManager.Instance);
+            // 加载场景自定义资源
+            ResourceManager.Instance.LoadSceneRes([sceneName]).then(() => {
+                o(UIManager.Instance, "onEnterScene", sceneName);
+                // 场景切换完成
+                this.setSceneName(sceneName);
+                this.scriptManager.InvokeStartDelegate();
+                this.onSceneLoaded(sceneName);
+                if (f(progress))
+                    progress(1);
+                if (f(completed))
+                    completed();
+            });
+        });
+    }
+    onSceneLoaded(sceneName) {
+    }
+};
+SceneManager = SceneManager_1 = __decorate([
+    i
+], SceneManager);
+
+class Managements {
+}
+Managements.UI = UIManager.Instance;
+Managements.Resource = new ResourceManager();
+Managements.Scene = new SceneManager();
+Managements.Event = new EventManager();
+
+const { ccclass: ccclass$1, property, executionOrder: executionOrder$1 } = _decorator;
+let CCHperEntry = class CCHperEntry extends BaseComponent {
+    constructor() {
+        super(...arguments);
+        this.resConfig = null;
+        this.uiConfig = null;
+        this.initializeFunction = "initialize";
+    }
+    onLoad() {
+        game.addPersistRootNode(this.node);
+        this.initialize();
+    }
+    initialize() {
+        var _a;
+        let _uiManager = (_a = this.Get("UIRoot")) === null || _a === void 0 ? void 0 : _a.addComponent(UIManager);
+        Reflect.set(Managements, "UI", _uiManager);
+        // 初始化依赖于固有资源的管理器
+        o(Managements.Resource, this.initializeFunction, this.resConfig).then(() => {
+            o(_uiManager, this.initializeFunction, this.uiConfig).then(() => {
+                o(Managements.Scene, this.initializeFunction);
+            });
+        });
+    }
+    start() {
+    }
+    update(deltaTime) {
+        // Your update function goes here.
+    }
+};
+__decorate([
+    property({
+        type: JsonAsset,
+        tooltip: "资源配置文件, 默认加载 resources/configs/res.json"
+    })
+], CCHperEntry.prototype, "resConfig", void 0);
+__decorate([
+    property({
+        type: JsonAsset,
+        tooltip: "UI配置文件, 默认加载 resources/configs/uis.json"
+    })
+], CCHperEntry.prototype, "uiConfig", void 0);
+CCHperEntry = __decorate([
+    ccclass$1('CCHperEntry'),
+    executionOrder$1(-1000)
+], CCHperEntry);
+
+class Platform {
+    static get IsBrowser() {
+        var _a;
+        return (_a = sys['isBrowser']) !== null && _a !== void 0 ? _a : false;
+    }
+}
+
+export { BaseComponent, CCHperEntry, EventBase, EventManager, ISceneScript, Managements, MetaData, PersistSceneName, Platform, ResourceManager, SYS_START, SYS_UPDATE, SceneManager, StartSceneName, UIBase, UIManager, UIType, mapString2CCAssetType, scene_script, ui_script };
+//# sourceMappingURL=index.mjs.map

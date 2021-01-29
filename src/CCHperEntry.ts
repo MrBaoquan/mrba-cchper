@@ -2,14 +2,14 @@ import { _decorator, game, JsonAsset } from "cc";
 import { CallFunction } from 'mrba-eshper';
 const { ccclass, property, executionOrder } = _decorator;
 
-import { UIManager } from './core/UIManager/UIManager';
-import { Managements } from './facades/Managements';
-import { BaseComponent } from './utils/CCUtils';
+import { UIManager } from 'mrba-cchper/src/core/UIManager/UIManager';
+import { Managements } from 'mrba-cchper/src/facades/Managements';
+import { BaseComponent } from 'mrba-cchper/src/utils/CCUtils';
 
 
-@ccclass('CCHelperEntry')
+@ccclass('CCHperEntry')
 @executionOrder(-1000)
-export class CCHelperEntry extends BaseComponent {
+export class CCHperEntry extends BaseComponent {
 
     @property({
         type: JsonAsset,
@@ -33,8 +33,8 @@ export class CCHelperEntry extends BaseComponent {
     initialize(){
         let _uiManager = this.Get("UIRoot")?.addComponent(UIManager);
         Reflect.set(Managements,"UI",_uiManager);
+
         // 初始化依赖于固有资源的管理器
-        
         CallFunction(Managements.Resource,this.initializeFunction, this.resConfig).then(()=>{
             CallFunction(<UIManager>_uiManager,this.initializeFunction, this.uiConfig).then(()=>{
                 CallFunction(Managements.Scene,this.initializeFunction);
@@ -46,7 +46,7 @@ export class CCHelperEntry extends BaseComponent {
         
     }
 
-    // update (deltaTime: number) {
-    //     // Your update function goes here.
-    // }
+    update (deltaTime: number) {
+        // Your update function goes here.
+    }
 }

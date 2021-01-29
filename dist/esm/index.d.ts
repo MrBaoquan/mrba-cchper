@@ -1,17 +1,18 @@
-import { Component, Node, __private, Asset, Director, JsonAsset } from "cc";
+import { Component, Node, __private, Asset, Director } from "cc";
 import { Constructor as Constructor$0 } from "cc";
 declare class BaseComponent extends Component {
     protected Get(path: string): Node | null;
     protected Get<T extends Component>(path: string, classConstructor: __private.Constructor<T>): T | null;
 }
 declare function mapString2CCAssetType(classname: string): __private.cocos_core_asset_manager_shared_AssetType;
-declare class CCHelperEntry extends BaseComponent {
+declare class CCHperEntry extends BaseComponent {
     private resConfig;
     private uiConfig;
     readonly initializeFunction: string;
     onLoad(): void;
     initialize(): void;
     start(): void;
+    update(deltaTime: number): void;
 }
 declare class Platform {
     static get IsBrowser(): boolean;
@@ -52,7 +53,15 @@ declare class MetaData {
     static GetUIScriptConstructor(scriptName: string): __private.Constructor<UIBase> | null;
     static GetUIClassRegisteredName<T extends UIBase>(uiScriptConstructor: __private.Constructor<T>): string | null;
 }
+/**
+ * 注册UI脚本
+ * @param className 脚本名称
+ */
 declare const ui_script: <T extends UIBase>(className: string) => (target: new (...args: any[]) => T) => void;
+/**
+ * 注册场景脚本
+ * @param classname 场景脚本名称
+ */
 declare const scene_script: <T extends ISceneScript>(classname: string) => (target: new (...args: any[]) => any) => void;
 declare class ResourceManager {
     static readonly Instance: ResourceManager;
@@ -106,28 +115,43 @@ declare class UIManager extends Component {
     private popupUIs;
     constructor();
     onLoad(): void;
-    initialize(asset?: JsonAsset): Promise<unknown>;
+    private initialize;
     /**
      * 获取UI实例
      * @param UIKey UI名称
-     * @param callback 成功获取到UI后的回调   失败无回调
+     * @param callback 成功获取到UI实例后的回调 失败无回调
      */
     Get(UIKey: string, callback?: (ui: UIBase) => void): UIBase | null;
-    Get<T extends UIBase>(UIKey: Constructor$0<T>, callback?: (ui: T) => void): T | null;
+    /**
+     * 获取UI实例
+     * @param UIClass UI类型
+     * @param callback 成功获取到UI实例后的回调 失败无回调
+     */
+    Get<T extends UIBase>(UIClass: Constructor$0<T>, callback?: (ui: T) => void): T | null;
     /**
      * 显示UI
      * @param UIKey UI名称
-     * @param callback 成功获取到UI后的回调  失败无回调
+     * @param callback 成功获取到UI实例后的回调 失败无回调
      */
     Show(UIKey: string, callback?: (ui: UIBase) => void): UIBase | null;
-    Show<T extends UIBase>(UIKey: Constructor$0<T>, callback?: (ui: T) => void): T | null;
+    /**
+     * 显示UI
+     * @param UIClass UI类型
+     * @param callback 成功获取到UI实例后的回调 失败无回调
+     */
+    Show<T extends UIBase>(UIClass: Constructor$0<T>, callback?: (ui: T) => void): T | null;
     /**
      * 隐藏UI
      * @param UIKey UI名称
      * @param callback 成功获取到UI实例后的回调 失败无回调
      */
     Hide(UIKey: string, callback?: (ui: UIBase) => void): UIBase | null;
-    Hide<T extends UIBase>(UIKey: Constructor$0<T>, callback?: (ui: T) => void): T | null;
+    /**
+     * 隐藏UI
+     * @param UIClass UI类型
+     * @param callback 成功获取到UI实例后的回调 失败无回调
+     */
+    Hide<T extends UIBase>(UIClass: Constructor$0<T>, callback?: (ui: T) => void): T | null;
     private hideUI;
     private showUI;
     private getUI;
@@ -145,9 +169,21 @@ declare class UIManager extends Component {
     private spawnUI;
     private getParentNode;
 }
+declare abstract class EventBase {
+}
+declare class SYS_UPDATE extends EventBase {
+}
+declare class SYS_START extends EventBase {
+}
+declare class EventManager {
+    Register<T extends EventBase>(eventHandler: (event: T) => void): void;
+    Unregister<T extends EventBase>(eventHandler: (event: T) => void): void;
+    private initialize;
+}
 declare class Managements {
     static readonly UI: UIManager;
     static readonly Resource: ResourceManager;
     static readonly Scene: SceneManager;
+    static readonly Event: EventManager;
 }
-export { CCHelperEntry, BaseComponent, mapString2CCAssetType, Platform, PersistSceneName, StartSceneName, Constructor, ISceneScript, MetaData, ui_script, scene_script, ResourceManager, SceneManager, UIType, UIBase, UIManager, Managements };
+export { CCHperEntry, BaseComponent, mapString2CCAssetType, Platform, PersistSceneName, StartSceneName, Constructor, ISceneScript, MetaData, ui_script, scene_script, ResourceManager, SceneManager, UIType, UIBase, UIManager, EventBase, SYS_UPDATE, SYS_START, EventManager, Managements };
