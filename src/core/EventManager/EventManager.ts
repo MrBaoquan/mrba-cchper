@@ -96,15 +96,16 @@ export class EventManager
             return;
         }
 
-        Logger.Log(event);
+        
         this.allEvents.get(_eventKey).forEach(_eventHandler=>{
+            console.log(typeof _eventHandler)
+            Logger.Log(event);
             CallFunction(_eventHandler,"Fire",event);
         });
     }
 
     public Unregister<T extends EventBase>(eventType:Constructor<T>, eventHandler:(event:T)=>void):boolean
     {
-        
         let _eventKey = eventType.name;
         if(!this.allEvents.has(_eventKey)){
             console.warn("不存在 " + _eventKey);

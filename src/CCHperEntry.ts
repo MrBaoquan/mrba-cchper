@@ -49,8 +49,7 @@ export class CCHperEntry extends BaseComponent {
 
     updateEvent:SYS_UPDATE = new SYS_UPDATE();
     update (deltaTime: number) {
-        Logger.Log("mrba-cchper update")
-        // Your update function goes here.
+        Logger.Log("mrba-cchper update", this.updateEvent)
         this.updateEvent.delta = deltaTime;
         Managements.Event.Fire(this.updateEvent);
     }

@@ -898,8 +898,9 @@ let EventManager = class EventManager {
         if (!this.allEvents.has(_eventKey)) {
             return;
         }
-        n.Log(event);
         this.allEvents.get(_eventKey).forEach(_eventHandler => {
+            console.log(typeof _eventHandler);
+            n.Log(event);
             o(_eventHandler, "Fire", event);
         });
     }
@@ -1079,8 +1080,7 @@ let CCHperEntry = class CCHperEntry extends BaseComponent {
         n.Log("mrba-cchper start");
     }
     update(deltaTime) {
-        n.Log("mrba-cchper update");
-        // Your update function goes here.
+        n.Log("mrba-cchper update", this.updateEvent);
         this.updateEvent.delta = deltaTime;
         Managements.Event.Fire(this.updateEvent);
     }
