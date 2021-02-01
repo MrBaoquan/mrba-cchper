@@ -1,10 +1,11 @@
 import { _decorator, game, JsonAsset } from "cc";
-import { CallFunction } from 'mrba-eshper';
+import { CallFunction, Logger } from 'mrba-eshper';
 const { ccclass, property, executionOrder } = _decorator;
 
-import { UIManager } from 'mrba-cchper/src/core/UIManager/UIManager';
-import { Managements } from 'mrba-cchper/src/facades/Managements';
-import { BaseComponent } from 'mrba-cchper/src/utils/CCUtils';
+import { UIManager } from './core/UIManager/UIManager';
+import { Managements } from './facades/Managements';
+import { BaseComponent } from './utils/CCUtils';
+import { SYS_UPDATE } from "./core/EventManager/EventManager";
 
 
 @ccclass('CCHperEntry')
@@ -43,10 +44,14 @@ export class CCHperEntry extends BaseComponent {
     }
 
     start () {
-        
+        Logger.Log("mrba-cchper start")
     }
 
+    updateEvent:SYS_UPDATE = new SYS_UPDATE();
     update (deltaTime: number) {
+        Logger.Log("mrba-cchper update")
         // Your update function goes here.
+        this.updateEvent.delta = deltaTime;
+        Managements.Event.Fire(this.updateEvent);
     }
 }

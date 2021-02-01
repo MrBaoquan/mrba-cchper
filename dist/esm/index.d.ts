@@ -1,10 +1,64 @@
 import { Component, Node, __private, Asset, Director } from "cc";
-import { Constructor as Constructor$0 } from "cc";
+import { Constructor as Constructor$1 } from "cc";
+import { Constructor } from "mrba-cchper/dist/cjs";
 declare class BaseComponent extends Component {
     protected Get(path: string): Node | null;
     protected Get<T extends Component>(path: string, classConstructor: __private.Constructor<T>): T | null;
 }
 declare function mapString2CCAssetType(classname: string): __private.cocos_core_asset_manager_shared_AssetType;
+interface IDisposable {
+    Dispose(): void;
+}
+declare abstract class EventBase {
+}
+declare class SYS_UPDATE extends EventBase {
+    delta: number;
+}
+declare class SYS_START extends EventBase {
+}
+type EventDelegate = (event: EventBase) => void;
+declare class EventHandler implements IDisposable {
+    private eventType;
+    private eventDelegate;
+    /**
+     * 事件模式
+     */
+    private eventMode;
+    get EventType(): string | null;
+    get EventDelegate(): EventDelegate | null;
+    /**
+     * 触发事件
+     */
+    private Fire;
+    /**
+     * 销毁事件
+     */
+    Dispose(): void;
+}
+declare class EventManager {
+    allEvents: Map<string, Map<EventDelegate, EventHandler>>;
+    /**
+     * 注册事件
+     * @param eventType 事件类型
+     * @param eventAction 事件响应
+     */
+    Register<T extends EventBase>(eventType: Constructor<T>, eventAction: (event: T) => void): IDisposable;
+    /**
+     * 注册事件，事件将会在触发一次后自动删除
+     * @param eventType 事件类型
+     * @param eventAction 事件响应
+     */
+    RegisterOnce<T>(eventType: Constructor<T>, eventAction: EventDelegate): IDisposable;
+    /**
+     * 触发事件
+     * @param event 事件实例
+     */
+    Fire<T extends EventBase>(event: T): void;
+    Unregister<T extends EventBase>(eventType: Constructor<T>, eventHandler: (event: T) => void): boolean;
+    private initialize;
+    private registerEvent;
+    private makeEventHandler;
+}
 declare class CCHperEntry extends BaseComponent {
     private resConfig;
     private uiConfig;
@@ -12,6 +66,7 @@ declare class CCHperEntry extends BaseComponent {
     onLoad(): void;
     initialize(): void;
     start(): void;
+    updateEvent: SYS_UPDATE;
     update(deltaTime: number): void;
 }
 declare class Platform {
@@ -39,19 +94,19 @@ declare class UIBase extends BaseComponent {
 }
 declare const PersistSceneName: string;
 declare const StartSceneName: string;
-type Constructor<T = {}> = new (...args: any[]) => T;
+type Constructor$0<T = {}> = new (...args: any[]) => T;
 declare abstract class ISceneScript {
 }
 declare class MetaData {
     private static sceneScriptClasses;
     static IsSceneScriptRegistered(scriptName: string): boolean;
-    static GetSceneScriptConstrutor(scriptName: string): Constructor | null;
+    static GetSceneScriptConstrutor(scriptName: string): Constructor$0 | null;
     private static uiClassNamesMap;
     private static uiScriptClasses;
     static IsUIScriptRegistered(scriptName: string): boolean;
-    static IsUIScriptRegistered<T extends UIBase>(scriptClass: __private.Constructor<T>): boolean;
-    static GetUIScriptConstructor(scriptName: string): __private.Constructor<UIBase> | null;
-    static GetUIClassRegisteredName<T extends UIBase>(uiScriptConstructor: __private.Constructor<T>): string | null;
+    static IsUIScriptRegistered<T extends UIBase>(scriptClass: __private.Constructor$0<T>): boolean;
+    static GetUIScriptConstructor(scriptName: string): __private.Constructor$0<UIBase> | null;
+    static GetUIClassRegisteredName<T extends UIBase>(uiScriptConstructor: __private.Constructor$0<T>): string | null;
 }
 /**
  * 注册UI脚本
@@ -91,7 +146,6 @@ declare class ResourceManager {
     private loadResourceDir;
 }
 declare class SceneManager {
-    private resConfig;
     private scriptManager;
     private sceneName;
     static Instance: SceneManager;
@@ -127,7 +181,7 @@ declare class UIManager extends Component {
      * @param UIClass UI类型
      * @param callback 成功获取到UI实例后的回调 失败无回调
      */
-    Get<T extends UIBase>(UIClass: Constructor$0<T>, callback?: (ui: T) => void): T | null;
+    Get<T extends UIBase>(UIClass: Constructor$1<T>, callback?: (ui: T) => void): T | null;
     /**
      * 显示UI
      * @param UIKey UI名称
@@ -139,7 +193,7 @@ declare class UIManager extends Component {
      * @param UIClass UI类型
      * @param callback 成功获取到UI实例后的回调 失败无回调
      */
-    Show<T extends UIBase>(UIClass: Constructor$0<T>, callback?: (ui: T) => void): T | null;
+    Show<T extends UIBase>(UIClass: Constructor$1<T>, callback?: (ui: T) => void): T | null;
     /**
      * 隐藏UI
      * @param UIKey UI名称
@@ -151,7 +205,7 @@ declare class UIManager extends Component {
      * @param UIClass UI类型
      * @param callback 成功获取到UI实例后的回调 失败无回调
      */
-    Hide<T extends UIBase>(UIClass: Constructor$0<T>, callback?: (ui: T) => void): T | null;
+    Hide<T extends UIBase>(UIClass: Constructor$1<T>, callback?: (ui: T) => void): T | null;
     private hideUI;
     private showUI;
     private getUI;
@@ -169,21 +223,10 @@ declare class UIManager extends Component {
     private spawnUI;
     private getParentNode;
 }
-declare abstract class EventBase {
-}
-declare class SYS_UPDATE extends EventBase {
-}
-declare class SYS_START extends EventBase {
-}
-declare class EventManager {
-    Register<T extends EventBase>(eventHandler: (event: T) => void): void;
-    Unregister<T extends EventBase>(eventHandler: (event: T) => void): void;
-    private initialize;
-}
 declare class Managements {
     static readonly UI: UIManager;
     static readonly Resource: ResourceManager;
     static readonly Scene: SceneManager;
     static readonly Event: EventManager;
 }
-export { CCHperEntry, BaseComponent, mapString2CCAssetType, Platform, PersistSceneName, StartSceneName, Constructor, ISceneScript, MetaData, ui_script, scene_script, ResourceManager, SceneManager, UIType, UIBase, UIManager, EventBase, SYS_UPDATE, SYS_START, EventManager, Managements };
+export { CCHperEntry, BaseComponent, mapString2CCAssetType, Platform, PersistSceneName, StartSceneName, Constructor$0 as Constructor, ISceneScript, MetaData, ui_script, scene_script, ResourceManager, SceneManager, UIType, UIBase, UIManager, IDisposable, EventBase, SYS_UPDATE, SYS_START, EventHandler, EventManager, Managements };

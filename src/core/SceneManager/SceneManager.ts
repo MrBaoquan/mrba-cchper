@@ -1,5 +1,4 @@
 import { CallFunction, isset, Logger, singleton } from "mrba-eshper";
-import { ResConfig } from "../ResourceManager/ResConfig";
 import { ResourceManager } from "../ResourceManager/ResourceManager";
 import { StartSceneName } from "../TypeDefinitions";
 import { UIManager } from "../UIManager/UIManager";
@@ -8,7 +7,6 @@ import { SceneScriptManager } from "./SceneScriptManager";
 @singleton
 export class SceneManager
 {
-    private resConfig:ResConfig  = new ResConfig();
     private scriptManager:SceneScriptManager = new SceneScriptManager();
     private sceneName:string = StartSceneName;
     public static Instance:SceneManager;
@@ -44,12 +42,15 @@ export class SceneManager
         },(error, sceneAsset)=>{
             // 
             Logger.Log("场景加载完成..", UIManager.Instance);
+            // 场景脚本声明周期 destroy 
+            this.scriptManager.InvokeOnDestroyDelegate();
             // 加载场景自定义资源
             ResourceManager.Instance.LoadSceneRes([sceneName]).then(()=>{
                 CallFunction(UIManager.Instance, "onEnterScene", sceneName);
 
                 // 场景切换完成
                 this.setSceneName(sceneName);
+                // 场景脚本生命周期 start update
                 this.scriptManager.InvokeStartDelegate();
                 this.onSceneLoaded(sceneName);
                 if(isset(progress))

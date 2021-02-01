@@ -822,17 +822,120 @@ UIManager = UIManager_1 = __decorate([
 class EventBase {
 }
 class SYS_UPDATE extends EventBase {
+    constructor() {
+        super(...arguments);
+        this.delta = 0.0;
+    }
 }
 class SYS_START extends EventBase {
 }
-let EventManager = class EventManager {
-    Register(eventHandler) {
-        console.log("!!!!!!!!!!! Register !!!!!!!!!!!!!!!!!!");
-        console.log(eventHandler);
+/**
+ * 事件模式
+ */
+var EventMode;
+(function (EventMode) {
+    EventMode[EventMode["Normal"] = 1] = "Normal";
+    EventMode[EventMode["Once"] = 2] = "Once"; //  一次性事件， 事件将会在触发一次后 自动移除
+})(EventMode || (EventMode = {}));
+class EventHandler {
+    constructor() {
+        /**
+         * 事件模式
+         */
+        this.eventMode = EventMode.Normal;
     }
-    Unregister(eventHandler) {
+    get EventType() {
+        return this.eventType ? this.eventType.prototype.constructor.name : null;
+    }
+    get EventDelegate() {
+        return this.eventDelegate;
+    }
+    /**
+     * 触发事件
+     */
+    Fire(event) {
+        if (this.eventMode === EventMode.Once) {
+            o(this.eventDelegate, event);
+            this.Dispose();
+            return;
+        }
+        n.Log(event);
+        o(this.eventDelegate, event);
+    }
+    /**
+     * 销毁事件
+     */
+    Dispose() {
+        Reflect.get(EventManager, c).Unregister(this.eventType, this.eventDelegate);
+    }
+}
+let EventManager = class EventManager {
+    constructor() {
+        this.allEvents = new Map();
+    }
+    /**
+     * 注册事件
+     * @param eventType 事件类型
+     * @param eventAction 事件响应
+     */
+    Register(eventType, eventAction) {
+        return this.registerEvent(eventType, eventAction, EventMode.Normal);
+    }
+    /**
+     * 注册事件，事件将会在触发一次后自动删除
+     * @param eventType 事件类型
+     * @param eventAction 事件响应
+     */
+    RegisterOnce(eventType, eventAction) {
+        return this.registerEvent(eventType, eventAction, EventMode.Once);
+    }
+    /**
+     * 触发事件
+     * @param event 事件实例
+     */
+    Fire(event) {
+        let _eventKey = Reflect.getPrototypeOf(event).constructor.name;
+        if (!this.allEvents.has(_eventKey)) {
+            return;
+        }
+        n.Log(event);
+        this.allEvents.get(_eventKey).forEach(_eventHandler => {
+            o(_eventHandler, "Fire", event);
+        });
+    }
+    Unregister(eventType, eventHandler) {
+        let _eventKey = eventType.name;
+        if (!this.allEvents.has(_eventKey)) {
+            console.warn("不存在 " + _eventKey);
+            return;
+        }
+        let _allEventHandlers = this.allEvents.get(_eventKey);
+        if (!_allEventHandlers.has(eventHandler)) {
+            console.warn("不存在该条事件处理器");
+            return;
+        }
+        _allEventHandlers.delete(eventHandler);
+        return true;
     }
     initialize() {
+    }
+    registerEvent(eventType, eventAction, eventMode = EventMode.Normal) {
+        let _eventKey = eventType.name;
+        if (!this.allEvents.has(_eventKey)) {
+            this.allEvents.set(_eventKey, new Map());
+        }
+        let _eventHandlers = this.allEvents.get(_eventKey);
+        if (!_eventHandlers.has(eventAction)) {
+            this.allEvents.get(_eventKey).set(eventAction, this.makeEventHandler(eventType, eventAction, eventMode));
+        }
+        return _eventHandlers.get(eventAction);
+    }
+    makeEventHandler(eventType, eventDelegate, eventMode = EventMode.Normal) {
+        let _eventHandler = new EventHandler();
+        Reflect.set(_eventHandler, "eventType", eventType);
+        Reflect.set(_eventHandler, "eventDelegate", eventDelegate);
+        Reflect.set(_eventHandler, "eventMode", eventMode);
+        return _eventHandler;
     }
 };
 EventManager = __decorate([
@@ -843,6 +946,7 @@ let SceneScriptManager = class SceneScriptManager {
     constructor() {
         this.sceneName = '';
         this.scripts = new Map();
+        this.updateHandler = null;
         this.SceneName = StartSceneName;
     }
     set SceneName(value) {
@@ -853,17 +957,33 @@ let SceneScriptManager = class SceneScriptManager {
         let _sceneScriptConstructor = MetaData.GetSceneScriptConstrutor(_sceneScriptName);
         this.scripts.set(this.sceneName, new _sceneScriptConstructor());
     }
+    get eventManager() {
+        return Reflect.get(EventManager, c);
+    }
     InvokeStartDelegate() {
         this.invoke('start');
+        if (f(this.updateHandler))
+            this.updateHandler.Dispose();
+        this.updateHandler = this.eventManager.Register(SYS_UPDATE, _event => {
+            n.Log(_event);
+            o(this.getSceneScript(this.sceneName), "update", _event.delta);
+        });
+    }
+    InvokeOnDestroyDelegate() {
+        if (f(this.updateHandler))
+            this.updateHandler.Dispose();
+        this.invoke("destroy");
+    }
+    getSceneScript(sceneName) {
+        if (!this.scripts.get(sceneName))
+            return null;
+        return this.scripts.get(sceneName);
     }
     invoke(funcName, ...args) {
-        if (!this.scripts.get(this.sceneName))
+        let _sceneScript = this.getSceneScript(this.sceneName);
+        if (!f(_sceneScript))
             return;
-        let _sceneScript = this.scripts.get(this.sceneName);
-        let _func = Reflect.get(_sceneScript, funcName);
-        if (_func !== undefined) {
-            Reflect.apply(_func, _sceneScript, []);
-        }
+        o(_sceneScript, funcName);
     }
 };
 SceneScriptManager = __decorate([
@@ -873,7 +993,6 @@ SceneScriptManager = __decorate([
 var SceneManager_1;
 let SceneManager = SceneManager_1 = class SceneManager {
     constructor() {
-        this.resConfig = new ResConfig();
         this.scriptManager = new SceneScriptManager();
         this.sceneName = StartSceneName;
         Reflect.set(SceneManager_1, "Instance", this);
@@ -901,11 +1020,14 @@ let SceneManager = SceneManager_1 = class SceneManager {
         }, (error, sceneAsset) => {
             // 
             n.Log("场景加载完成..", UIManager.Instance);
+            // 场景脚本声明周期 destroy 
+            this.scriptManager.InvokeOnDestroyDelegate();
             // 加载场景自定义资源
             ResourceManager.Instance.LoadSceneRes([sceneName]).then(() => {
                 o(UIManager.Instance, "onEnterScene", sceneName);
                 // 场景切换完成
                 this.setSceneName(sceneName);
+                // 场景脚本生命周期 start update
                 this.scriptManager.InvokeStartDelegate();
                 this.onSceneLoaded(sceneName);
                 if (f(progress))
@@ -936,6 +1058,7 @@ let CCHperEntry = class CCHperEntry extends BaseComponent {
         this.resConfig = null;
         this.uiConfig = null;
         this.initializeFunction = "initialize";
+        this.updateEvent = new SYS_UPDATE();
     }
     onLoad() {
         game.addPersistRootNode(this.node);
@@ -953,9 +1076,13 @@ let CCHperEntry = class CCHperEntry extends BaseComponent {
         });
     }
     start() {
+        n.Log("mrba-cchper start");
     }
     update(deltaTime) {
+        n.Log("mrba-cchper update");
         // Your update function goes here.
+        this.updateEvent.delta = deltaTime;
+        Managements.Event.Fire(this.updateEvent);
     }
 };
 __decorate([
@@ -982,5 +1109,5 @@ class Platform {
     }
 }
 
-export { BaseComponent, CCHperEntry, EventBase, EventManager, ISceneScript, Managements, MetaData, PersistSceneName, Platform, ResourceManager, SYS_START, SYS_UPDATE, SceneManager, StartSceneName, UIBase, UIManager, UIType, mapString2CCAssetType, scene_script, ui_script };
+export { BaseComponent, CCHperEntry, EventBase, EventHandler, EventManager, ISceneScript, Managements, MetaData, PersistSceneName, Platform, ResourceManager, SYS_START, SYS_UPDATE, SceneManager, StartSceneName, UIBase, UIManager, UIType, mapString2CCAssetType, scene_script, ui_script };
 //# sourceMappingURL=index.mjs.map
